@@ -16,10 +16,8 @@ create table if not exists doctors (
     id serial not null primary key,
     name varchar(255) NOT NULL,
     premium_money int not null,
-    department_id int not null,
     salary int not null,
-    surname varchar(255) not null,
-	FOREIGN key(department_id) REFERENCES departments(id) on delete cascade
+    surname varchar(255) not null
 );
 
 create table if not exists doctorsExaminations (
@@ -38,7 +36,7 @@ amount int not null,
 date date not null,
 department_id int not null,
 sponsor_id int not null,
-FOREIGN key(department_id) REFERENCES departments(id)
+FOREIGN key(department_id) REFERENCES departments(id) on delete cascade
 );
 
 create table if not exists examinations (
@@ -65,10 +63,15 @@ INSERT INTO departments (building, name) VALUES
 (2, 'Neurology'),
 (3, 'General Surgery');
 
-INSERT INTO doctors (name, premium_money, department_id, salary, surname) VALUES
-('John', 500, 1, 6000, 'Doe'),
-('Alice', 600, 2, 7000, 'Smith'),
-('Michael', 400, 3, 5500, 'Johnson');
+INSERT INTO doctors (name, premium_money, salary, surname) VALUES
+('John', 500, 6000, 'Doe'),
+('Alice', 600, 7000, 'Smith'),
+('Michael', 400, 5500, 'Johnson');
+
+INSERT INTO doctorsExaminations (startTime, endTime, doctor_id, examination_id, ward_id) VALUES 
+('12:00', '15:00', 1, 1, 1),
+('15:00', '16:00', 2, 2, 2),
+('16:00', '17:00', 3, 3, 3);
 
 INSERT INTO examinations (name) VALUES
 ('MRI Scan'),
@@ -88,7 +91,8 @@ INSERT INTO wards (name, places, department_id) VALUES
 INSERT INTO donations (amount, date, department_id, sponsor_id) VALUES
 (1000, '2024-04-23', 1, 1),
 (500, '2024-04-23', 1, 1),
-(1500, '2024-04-24', 2, 2);
+(1500, '2024-04-24', 3, 2);
+
 
 
 --Task 1
@@ -119,7 +123,6 @@ INSERT INTO donations (amount, date, department_id, sponsor_id) VALUES
 --from doctors as d
 --where d.salary > (select salary from doctors where name = 'John' and surname = 'Doe');
 
-
 --Task 5
 --select w.name, w.places
 --from wards as w
@@ -132,8 +135,35 @@ INSERT INTO donations (amount, date, department_id, sponsor_id) VALUES
 --on wr.department_id = d.id  
 --where d.name = 'Cardiology');
 
-
 --Task 6
-select d.name, d.surname
-from doctors as d
-where d.salary > (select sum(salary + premium_money) from doctors where name = 'John' and surname = 'Doe');
+--select d.name, d.surname
+--from doctors as d
+--where (d.salary + d.premium_money) > (select sum(salary + 100) from doctors where name = 'John' and surname = 'Doe')
+--and name <> 'John' and surname <> 'Doe';
+
+--Task 7
+--select dp.name
+--from doctors as d
+--join doctorsExaminations as de
+--on de.doctor_id = d.id
+--join wards as w
+--on de.ward_id = w.id
+--join departments as dp
+--on w.department_id = dp.id
+--where d.name = 'Michael' and d.surname = 'Johnson';
+
+--Task 8
+--select sp.name
+--from sponsors as sp
+--join donations as don
+--on sp.id = don.sponsor_id 
+--join departments as dp
+--on don.department_id = dp.id
+--where dp.name != 'Cardiology' and dp.name != 'Neurology'; 
+
+--Task 9
+--select d.surname
+--from doctors as d
+--join doctorsExaminations as de
+--on d.id = de.doctor_id
+--where de.startTime = '12:00' and de.endTime = '15:00';
